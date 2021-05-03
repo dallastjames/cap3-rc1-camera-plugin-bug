@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
 import exifr from 'exifr';
 
-import { Plugins, CameraResultType } from '@capacitor/core';
-
-const { Camera } = Plugins;
+import { Camera, CameraResultType } from '@capacitor/camera';
 
 const options = {
   ifd1: false,
@@ -17,34 +15,32 @@ const options = {
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-
   constructor() {
+    fetch('/assets/test-image.jpg')
+      .then((resp) => resp.arrayBuffer())
+      .then(async (ab) => {
+        console.log(ab);
 
-
-    fetch('/assets/test-image.jpg').then((resp) => resp.arrayBuffer()).then(async (ab) => {
-      console.log(ab);
-
-      const exif = await exifr.parse(ab, options);
-      console.log(exif);
-    });
-
+        const exif = await exifr.parse(ab, options);
+        console.log(exif);
+      });
   }
-
 
   async takePicture() {
     console.log('take');
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: true,
-      resultType: CameraResultType.Uri
+      resultType: CameraResultType.Uri,
     });
 
-    fetch(image.webPath).then((resp) => resp.arrayBuffer()).then(async (ab) => {
-      console.log(ab);
+    fetch(image.webPath)
+      .then((resp) => resp.arrayBuffer())
+      .then(async (ab) => {
+        console.log(ab);
 
-      const exif = await exifr.parse(ab, options);
-      console.log(exif);
-    });
+        const exif = await exifr.parse(ab, options);
+        console.log(exif);
+      });
   }
-
 }
